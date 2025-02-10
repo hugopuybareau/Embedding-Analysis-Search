@@ -4,8 +4,9 @@ from gensim.models import Word2Vec
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import word_tokenize
-import nltk
-nltk.download('punkt_tab')
+
+# import nltk
+# nltk.download('punkt_tab')
 
 class EmbeddingModel:
     def __init__(self, method):
