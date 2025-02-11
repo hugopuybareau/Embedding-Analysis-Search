@@ -97,6 +97,24 @@ class EmbeddingModel:
         plt.grid()
         plt.show()
 
+    def index_texts(self, texts): # I create a memory for the texts' embeddings before the search thing
+        embeddings = self.transform(texts)
+        self.texts_embeddings = {i: (doc, embeddings[i]) for i, doc in enumerate(texts)}
+        print(f"Indexed {len(texts)} texts.")
+
+    def search_similar(self, query, how_much_results):
+        if not self.texts_embeddings : raise ValueError('Call index_texts() first.')
+
+        query_embedding = self.transform([query])[0]
+        texts_embeddings_arr = np.array([emb[1] for emb in self.texts_embeddings.values()])
+
+        similarities = cosine_similarity([query_embedding], texts_embeddings_arr)[0]
+        top_indices = np.argsort(similarities)[::-1][:how_much_results]
+
+        return [(self.texts_embeddings[i][0], similarities[i]) for i in top_indices]
+
+
+
 
 
         
