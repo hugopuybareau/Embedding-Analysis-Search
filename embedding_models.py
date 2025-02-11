@@ -4,6 +4,11 @@ from gensim.models import Word2Vec
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 from nltk.tokenize import word_tokenize
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
 
 # import nltk
 # nltk.download('punkt_tab')
@@ -30,7 +35,7 @@ class EmbeddingModel:
         
         elif self.method == 'sbert':
             self.model = SentenceTransformer("paraphrase-MiniLM-L6-v2")
-            
+
         else: raise ValueError('Unknown method -> (word2vec, tfidf, sbert)')
             
         
@@ -57,6 +62,41 @@ class EmbeddingModel:
 
     def similarity(self, vec1, vec2):
         return cosine_similarity([vec1], [vec2])[0][0]
+    
+    def visualize_embeddings(self, texts, labels, method):
+        embeddings = self.transform(texts)
+        if method == 'pca':
+            reducer = PCA(n_components=2)
+        elif method == 'tsne':
+            reducer = TSNE(n_components=2, perplexity=3, random_state=0)
+            # perplexity must be less than n_samples
+        elif method == 'tsne scaled':
+            scaler = StandardScaler()
+            embeddings = StandardScaler().fit_transform(embeddings)
+            reducer = TSNE(n_components=2, perplexity=2, random_state=0)
+        else: raise ValueError('Unknown method -> (pca, tsne, tsne scaled)')
+
+        reduced_embeddings = reducer.fit_transform(embeddings)
+
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(
+            x=reduced_embeddings[:, 0],
+            y=reduced_embeddings[:, 1],
+            hue=labels,
+            palette="coolwarm",
+            s=100
+        )
+        for i, text in enumerate(texts):
+            plt.annotate(
+                text[:15],
+                (reduced_embeddings[i, 0], reduced_embeddings[i, 1]),
+                 fontsize=9,
+                 alpha=0.7
+            )
+        plt.title(f"Embedding Projection using {method.upper()}")
+        plt.grid()
+        plt.show()
+
 
 
         
