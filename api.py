@@ -22,17 +22,24 @@ texts = [ # The text corpus
 model.fit(texts) # Train and Index the texts
 model.index_texts(texts)
 
-@app.get("/") #GET route
-def home():
-    return {"message": "API running"}
-
 class QueryRequest(BaseModel): # Pydantic model for the query
     query: str
     how_much_results: int = 3
 
+class DocumentRequest(BaseModel): 
+    texts: List[str]
+
+@app.get("/") #GET route
+def home():
+    return {"message": "API running"}
+
 @app.post("/search/") # Post endpoint because user sends input data
 def search(request: QueryRequest):
     results = model.search_similar(request.query, request.how_much_results)
-    return {"query": request.query, "results": [{"document": doc, "score": score} for doc, score in results]}
+    return {"query": request.query, "results": [{"document": doc, "score": f"{float(score):.2f}, "} for doc, score in results]}
 
-model.search_similar(request.query, request.top_k)
+@app.post("/index/") # Post endpoint because user sends data again
+def index_new_texts(request: DocumentRequest):
+    model.index_texts(request.texts)
+    return {"message": f"Indexed {len(request.texts)} new texts."}
+
