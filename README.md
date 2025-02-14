@@ -23,12 +23,17 @@ A **FastAPI-powered** semantic search engine using **SBERT embeddings** to find 
 
 ### Example search request:
 
-**json**
-
+- `json`
 {
   "query": "Artificial intelligence in finance",
   "how_much_results": 3
 }
+
+- `curl`
+curl 
+-X POST "http://localhost:8000/search/" 
+-H "Content-Type: application/json" 
+-d '{"query": "AI", "how_much_results": 3}'
 
 ## 🔗 Technologies Used
 - **Backend**: FastAPI, Uvicorn, `Sentence-BERT`
@@ -38,6 +43,7 @@ A **FastAPI-powered** semantic search engine using **SBERT embeddings** to find 
 ## To clone :
 
 git clone https://github.com/your-username/semantic-search-project.git
+
 cd semantic-search-project
 
 
